@@ -1,79 +1,109 @@
 <?php
 
+namespace Tests\Feature;
+
 use App\Models\Student;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+class StudentManagementTest extends TestCase
+{
+    use RefreshDatabase;
 
-test('students index loads successfully', function () {
-    Student::factory()->create([
-        'student_id' => 'STU-1001',
-        'first_name' => 'Ada',
-        'last_name' => 'Lovelace',
-        'email' => 'ada@example.com',
-    ]);
+    public function test_students_index_loads_successfully(): void
+    {
+        Student::factory()->create([
+            'student_id' => 'STU-1001',
+            'first_name' => 'Ada',
+            'last_name' => 'Lovelace',
+            'email' => 'ada@example.com',
+        ]);
 
-    $response = $this->get('/students');
+        $response = $this->get('/students');
 
-    $response->assertOk()
-        ->assertSee('Lincoln Student Management')
-        ->assertSee('Ada');
-});
+        $response->assertOk()
+            ->assertSee('Lincoln Student Management')
+            ->assertSee('Ada');
+    }
 
-test('a student can be created', function () {
-    $response = $this->post('/students', [
-        'student_id' => 'STU-2001',
-        'first_name' => 'Grace',
-        'last_name' => 'Hopper',
-        'email' => 'grace@example.com',
-        'phone' => '123456789',
-        'date_of_birth' => '1999-12-09',
-        'gender' => 'Female',
-        'address' => '25 Tech Street',
-        'department' => 'Computer Science',
-        'year_level' => '3rd Year',
-    ]);
+    public function test_a_student_profile_displays_contact_and_academic_details(): void
+    {
+        $student = Student::factory()->create([
+            'student_id' => 'STU-1501',
+            'first_name' => 'Katherine',
+            'last_name' => 'Johnson',
+            'email' => 'katherine@example.com',
+            'department' => 'Mathematics',
+            'year_level' => '4th Year',
+        ]);
 
-    $response->assertRedirect('/students');
+        $response = $this->get(route('students.show', $student));
 
-    $this->assertDatabaseHas('students', [
-        'student_id' => 'STU-2001',
-        'email' => 'grace@example.com',
-    ]);
-});
+        $response->assertOk()
+            ->assertSee('Katherine Johnson')
+            ->assertSee('katherine@example.com')
+            ->assertSee('Mathematics')
+            ->assertSee('4th Year');
+    }
 
-test('a student can be updated', function () {
-    $student = Student::factory()->create([
-        'student_id' => 'STU-3001',
-        'first_name' => 'Alan',
-        'last_name' => 'Turing',
-        'email' => 'alan@example.com',
-        'department' => 'Mathematics',
-    ]);
+    public function test_a_student_can_be_created(): void
+    {
+        $response = $this->post('/students', [
+            'student_id' => 'STU-2001',
+            'first_name' => 'Grace',
+            'last_name' => 'Hopper',
+            'email' => 'grace@example.com',
+            'phone' => '123456789',
+            'date_of_birth' => '1999-12-09',
+            'gender' => 'Female',
+            'address' => '25 Tech Street',
+            'department' => 'Computer Science',
+            'year_level' => '3rd Year',
+        ]);
 
-    $response = $this->put('/students/'.$student->id, [
-        'student_id' => 'STU-3001',
-        'first_name' => 'Alan',
-        'last_name' => 'Turing',
-        'email' => 'alan.updated@example.com',
-        'department' => 'Computer Science',
-        'year_level' => '4th Year',
-    ]);
+        $response->assertRedirect('/students');
 
-    $response->assertRedirect('/students');
+        $this->assertDatabaseHas('students', [
+            'student_id' => 'STU-2001',
+            'email' => 'grace@example.com',
+        ]);
+    }
 
-    $this->assertDatabaseHas('students', [
-        'id' => $student->id,
-        'email' => 'alan.updated@example.com',
-        'department' => 'Computer Science',
-    ]);
-});
+    public function test_a_student_can_be_updated(): void
+    {
+        $student = Student::factory()->create([
+            'student_id' => 'STU-3001',
+            'first_name' => 'Alan',
+            'last_name' => 'Turing',
+            'email' => 'alan@example.com',
+            'department' => 'Mathematics',
+        ]);
 
-test('a student can be deleted', function () {
-    $student = Student::factory()->create();
+        $response = $this->put('/students/'.$student->id, [
+            'student_id' => 'STU-3001',
+            'first_name' => 'Alan',
+            'last_name' => 'Turing',
+            'email' => 'alan.updated@example.com',
+            'department' => 'Computer Science',
+            'year_level' => '4th Year',
+        ]);
 
-    $response = $this->delete('/students/'.$student->id);
+        $response->assertRedirect('/students');
 
-    $response->assertRedirect('/students');
-    $this->assertDatabaseMissing('students', ['id' => $student->id]);
-});
+        $this->assertDatabaseHas('students', [
+            'id' => $student->id,
+            'email' => 'alan.updated@example.com',
+            'department' => 'Computer Science',
+        ]);
+    }
+
+    public function test_a_student_can_be_deleted(): void
+    {
+        $student = Student::factory()->create();
+
+        $response = $this->delete('/students/'.$student->id);
+
+        $response->assertRedirect('/students');
+        $this->assertDatabaseMissing('students', ['id' => $student->id]);
+    }
+}

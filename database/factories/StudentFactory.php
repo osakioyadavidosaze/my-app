@@ -18,16 +18,16 @@ class StudentFactory extends Factory
     public function definition(): array
     {
         return [
-            'student_id' => 'STU-'.$this->faker->unique()->numberBetween(1000, 9999),
-            'first_name' => $this->faker->firstName(),
-            'last_name' => $this->faker->lastName(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'phone' => $this->faker->phoneNumber(),
-            'date_of_birth' => $this->faker->dateTimeBetween('-25 years', '-15 years')->format('Y-m-d'),
-            'gender' => $this->faker->randomElement(['Male', 'Female', 'Other']),
-            'address' => $this->faker->streetAddress().', '.$this->faker->city(),
-            'department' => $this->faker->randomElement(['Computer Science', 'Business', 'Engineering', 'Arts']),
-            'year_level' => $this->faker->randomElement(['1st Year', '2nd Year', '3rd Year', '4th Year']),
+            'student_id' => 'STU-'.fake()->unique()->numberBetween(1000, 9999),
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
+            'email' => fake()->unique()->safeEmail(),
+            'phone' => fake()->phoneNumber(),
+            'date_of_birth' => fake()->dateTimeBetween('-25 years', '-15 years')->format('Y-m-d'),
+            'gender' => fake()->randomElement(['Male', 'Female', 'Other']),
+            'address' => fake()->streetAddress().', '.fake()->city(),
+            'department' => fake()->randomElement(['Computer Science', 'Business', 'Engineering', 'Arts']),
+            'year_level' => fake()->randomElement(['1st Year', '2nd Year', '3rd Year', '4th Year']),
         ];
     }
 }
